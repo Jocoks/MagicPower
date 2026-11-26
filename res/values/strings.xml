@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MagicPower</string>
+    <string name="module_description">MagicPower：在系统管家电池页显示每个 App 的前台/后台功耗（W）。作用域：com.hihonor.systemmanager。</string>
+</resources>

@@ -1,0 +1,13 @@
+build/
+*.apk
+*.idsig
+*.dex
+*.jar
+*.aar
+*.zip
+tools/deb/
+tools/platform-*
+tools/android.jar
+.work/
+__pycache__/
+*.pyc

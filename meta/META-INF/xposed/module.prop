@@ -1,0 +1,5 @@
+minApiVersion=102
+targetApiVersion=102
+staticScope=false
+exceptionMode=protective
+description=MagicPower：在系统管家电池页显示每个 App 的前台/后台功耗（W）。作用域：com.hihonor.systemmanager。
