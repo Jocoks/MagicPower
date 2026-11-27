@@ -14,34 +14,46 @@ VN=$(grep -o 'android:versionName="[^"]*"' "$ROOT/AndroidManifest.xml" | cut -d'
 OUT="$BUILD/MagicPower-${VN}-unsigned.apk"
 echo "versionCode -> $VC"
 
-rm -rf "$BUILD"
-mkdir -p "$BUILD/classes" "$BUILD/dex"
+[ -x /usr/local/go/bin/go ] && PATH="/usr/local/go/bin:$PATH"
+export PATH
 
-echo "[1/5] javac"
+rm -rf "$BUILD"
+mkdir -p "$BUILD/classes" "$BUILD/dex" "$BUILD/assets"
+
+echo "[0/6] go build (检查页面服务)"
+if command -v go >/dev/null 2>&1; then
+    ( cd "$ROOT/web" && go build -o "$BUILD/assets/magicpower-check" . )
+    echo "    -> $(du -h "$BUILD/assets/magicpower-check" | cut -f1)"
+else
+    echo "    !! 未找到 go，APK 将不含检查页面"
+    rmdir "$BUILD/assets" 2>/dev/null || true
+fi
+
+echo "[1/6] javac"
 javac -source 8 -target 8 -nowarn -Xlint:-options \
     -classpath "$TOOLS/android.jar:$TOOLS/libxposed-api.jar" \
     -d "$BUILD/classes" \
     $(find "$ROOT/src" -name '*.java')
 
-echo "[2/5] d8"
+echo "[2/6] d8"
 java -cp "$TOOLS/d8.jar" com.android.tools.r8.D8 \
     --lib "$TOOLS/android.jar" --min-api 29 \
     --output "$BUILD/dex" \
     $(find "$BUILD/classes" -name '*.class')
 
-echo "[3/5] aapt2 compile"
+echo "[3/6] aapt2 compile"
 aapt2 compile --dir "$ROOT/res" -o "$BUILD/res.zip"
 
-echo "[4/5] aapt2 link + pack"
+echo "[4/6] aapt2 link + pack"
 aapt2 link \
     -o "$BUILD/base.apk" \
     -I "$TOOLS/android.jar" \
     --manifest "$ROOT/AndroidManifest.xml" \
     "$BUILD/res.zip"
 python3 "$TOOLS/pack.py" "$BUILD/base.apk" "$BUILD/unsigned.apk" \
-    "$BUILD/dex/classes.dex" "$ROOT/meta"
+    "$BUILD/dex/classes.dex" "$ROOT/meta" "$BUILD/assets"
 
-echo "[5/5] zipalign"
+echo "[5/6] zipalign"
 zipalign -f -p 4 "$BUILD/unsigned.apk" "$OUT"
 
 echo "OK -> $OUT"

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light only">
+<title>MagicPower</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ==================== 首页 ==================== -->
+  <div id="view-home" class="view">
+    <header class="head">
+      <h1>MagicPower</h1>
+      <p class="lead">手机功耗与性能工具箱</p>
+    </header>
+
+    <nav class="features">
+      <a class="feature" href="#/thermal">
+        <span class="feature-icon">🌡</span>
+        <span class="feature-body">
+          <span class="feature-title">发热自检</span>
+          <span class="feature-desc">找出吃满 CPU 的异常进程，支持一键停止</span>
+        </span>
+        <span class="feature-arrow">›</span>
+      </a>
+
+      <!-- 以后新增功能：在这里加一张 .feature 卡片，
+           并在下方 view 区域加对应视图即可 -->
+    </nav>
+
+    <p class="home-foot">MagicPower 1.0.0 · 需要 root</p>
+  </div>
+
+  <!-- ==================== 发热自检 ==================== -->
+  <div id="view-thermal" class="view" hidden>
+    <header class="page-head">
+      <button id="back" class="back" aria-label="返回">‹</button>
+      <h1>发热自检</h1>
+    </header>
+
+    <p class="lead">手机发烫时，先看是谁在吃 CPU。判定依据：单核满载 ≥ 80%、内核态占比 ≥ 50%、PPid = 1 的孤儿进程。</p>
+
+    <div class="bar">
+      <label class="field">采样
+        <select id="window">
+          <option value="3">3 秒</option>
+          <option value="5" selected>5 秒</option>
+          <option value="10">10 秒</option>
+        </select>
+      </label>
+      <button id="run" class="primary">开始检查</button>
+      <label class="check"><input type="checkbox" id="auto"> 每 30 秒自动刷新</label>
+    </div>
+
+    <div id="status" class="status" role="status" aria-live="polite"></div>
+    <div id="service" class="service" hidden></div>
+
+    <div id="result" class="result" hidden>
+
+      <section class="card findings">
+        <h2>判定</h2>
+        <div id="findings"></div>
+      </section>
+
+      <div class="grid">
+        <section class="card">
+          <h2>电池</h2>
+          <dl id="battery" class="kv"></dl>
+        </section>
+        <section class="card">
+          <h2>全局 CPU</h2>
+          <dl id="cpu" class="kv"></dl>
+        </section>
+      </div>
+
+      <section class="card">
+        <h2>温度传感器 <small>最高 3 个</small></h2>
+        <ul id="sensors" class="sensors"></ul>
+      </section>
+
+      <section class="card">
+        <h2>CPU 占用 Top 5</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>PID</th><th class="num">CPU%</th><th class="num">内核态</th><th>进程</th></tr>
+            </thead>
+            <tbody id="top"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <h2>日志</h2>
+          <button id="copy" class="ghost">复制日志</button>
+        </div>
+        <pre id="log" class="log"></pre>
+      </section>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- 自定义确认框：WebView 默认不实现 window.confirm，会静默返回 false -->
+<div id="modal" class="modal" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true">
+    <h3 id="modal-title">确认操作</h3>
+    <p id="modal-text" class="modal-text"></p>
+    <div class="modal-actions">
+      <button id="modal-cancel" class="ghost">取消</button>
+      <button id="modal-ok" class="modal-primary">确认停止</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

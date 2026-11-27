@@ -11,3 +11,4 @@ tools/android.jar
 .work/
 __pycache__/
 *.pyc
+web/magicpower-check
